@@ -744,6 +744,7 @@ parcelHelpers.export(exports, "deleteMessageFromFirebase", ()=>deleteMessageFrom
 parcelHelpers.export(exports, "listenForMessageChanges", ()=>listenForMessageChanges);
 var _app = require("firebase/app");
 var _database = require("firebase/database");
+var _autodeleteOldMessagesJs = require("./autodeleteOldMessages.js");
 const firebaseConfig = {
     apiKey: "AIzaSyBkhDaFysGKdVS5xq5MQUMy0sgFImUbz_o",
     authDomain: "messageboard-g6.firebaseapp.com",
@@ -755,6 +756,8 @@ const firebaseConfig = {
 };
 const app = (0, _app.initializeApp)(firebaseConfig);
 const db = (0, _database.getDatabase)(app);
+// ✅ Kör radering av gamla meddelanden vid sidans start
+(0, _autodeleteOldMessagesJs.deleteOldMessages)(db);
 async function addMessageToFirebase(message, user, color) {
     let dateString = new Date(Date.now()).toString();
     const messageData = {
@@ -849,7 +852,7 @@ function listenForMessageChanges(callback) {
     });
 }
 
-},{"firebase/app":"cYOm2","firebase/database":"eqXsT","@parcel/transformer-js/src/esmodule-helpers.js":"jnFvT"}],"cYOm2":[function(require,module,exports,__globalThis) {
+},{"firebase/app":"cYOm2","firebase/database":"eqXsT","./autodeleteOldMessages.js":"djI61","@parcel/transformer-js/src/esmodule-helpers.js":"jnFvT"}],"cYOm2":[function(require,module,exports,__globalThis) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 var _app = require("@firebase/app");
@@ -15934,7 +15937,64 @@ process.umask = function() {
     return 0;
 };
 
-},{}],"lA8tp":[function(require,module,exports,__globalThis) {
+},{}],"djI61":[function(require,module,exports,__globalThis) {
+var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
+parcelHelpers.defineInteropFlag(exports);
+parcelHelpers.export(exports, "isMessageOld", ()=>isMessageOld);
+// Funktion för att ta bort gamla meddelanden från Firebase
+parcelHelpers.export(exports, "deleteOldMessages", ()=>deleteOldMessages);
+var _database = require("firebase/database"); // Importera nödvändiga funktioner från Firebase
+const isMessageOld = (timestamp)=>{
+    const messageDate = new Date(timestamp); // Konvertera Unix timestamp till ett Date-objekt
+    const currentDate = new Date(); // Hämta dagens datum
+    const timeDifference = currentDate - messageDate; // Beräkna tidsdifferensen
+    const twoDaysInMillis = 172800000; // 2 dagar i millisekunder
+    console.log("\uD83D\uDD52 Kontroll av meddelande\xe5lder:");
+    console.log(`\u{1F4CC} Meddelandets tidst\xe4mpel: ${messageDate}`);
+    console.log(`\u{1F4CC} Aktuellt datum: ${currentDate}`);
+    console.log(`\u{23F3} Tidsdifferens i millisekunder: ${timeDifference}`);
+    console.log(`\u{231B} Gr\xe4ns f\xf6r radering: ${twoDaysInMillis}`);
+    return timeDifference > twoDaysInMillis; // Om meddelandet är äldre än 2 dagar, returnera true
+};
+async function deleteOldMessages(db) {
+    console.log("\uD83D\uDDD1\uFE0F deleteOldMessages har startat!");
+    const messagesRef = (0, _database.ref)(db, "messages");
+    try {
+        const snapshot = await (0, _database.get)(messagesRef); // Hämta alla meddelanden från Firebase
+        if (!snapshot.exists()) {
+            console.log("\u26A0\uFE0F Inga meddelanden hittades.");
+            return;
+        }
+        const messages = snapshot.val();
+        console.log("\uD83D\uDCE9 H\xe4mtade meddelanden:", messages);
+        // Loopa igenom alla meddelanden och kontrollera om de är äldre än 2 dagar
+        for(const messageId in messages){
+            const message = messages[messageId];
+            let timestamp = message.timestamp; // Hämta timestamp istället för dateString
+            if (!timestamp) {
+                // Om meddelandet saknar timestamp, sätt nuvarande tid
+                console.log(`\u{26A0}\u{FE0F} Meddelande ${messageId} saknar en giltig timestamp. Anv\xe4nder nu tidsst\xe4mpel f\xf6r nuvarande tid.`);
+                timestamp = Date.now(); // Sätt nuvarande tid (Unix timestamp)
+                // Uppdatera meddelandet med den nya timestampen
+                await (0, _database.update)((0, _database.ref)(db, `messages/${messageId}`), {
+                    timestamp
+                });
+                console.log(`\u{2705} Meddelande ${messageId} har nu f\xe5tt en giltig timestamp.`);
+            }
+            console.log(`\u{1F575}\u{FE0F}\u{200D}\u{2642}\u{FE0F} Kontrollerar meddelande ${messageId} med timestamp: ${timestamp}`);
+            // Om meddelandet är äldre än 2 dagar, ta bort det
+            if (isMessageOld(timestamp)) {
+                console.log(`\u{1F5D1}\u{FE0F} Tar bort gammalt meddelande ${messageId}...`);
+                await (0, _database.remove)((0, _database.ref)(db, `messages/${messageId}`)); // Ta bort meddelandet från Firebase
+                console.log(`\u{2705} Meddelande ${messageId} har raderats!`);
+            } else console.log(`\u{2705} Meddelande ${messageId} \xe4r fortfarande nytt.`);
+        }
+    } catch (error) {
+        console.error("\u274C Fel vid radering av gamla meddelanden:", error);
+    }
+}
+
+},{"firebase/database":"eqXsT","@parcel/transformer-js/src/esmodule-helpers.js":"jnFvT"}],"lA8tp":[function(require,module,exports,__globalThis) {
 var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 parcelHelpers.export(exports, "displayMessages", ()=>displayMessages);

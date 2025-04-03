@@ -1,5 +1,7 @@
 import { initializeApp } from "firebase/app";
 import { getDatabase, ref, push, get, update, remove, onValue } from "firebase/database";
+import { deleteOldMessages } from "./autodeleteOldMessages.js";
+
 
 const firebaseConfig = {
     apiKey: "AIzaSyBkhDaFysGKdVS5xq5MQUMy0sgFImUbz_o",
@@ -13,6 +15,9 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
+
+// ✅ Kör radering av gamla meddelanden vid sidans start
+deleteOldMessages(db);
 
 export async function addMessageToFirebase(message, user, color,) {
     let dateString=new Date(Date.now()).toString()

@@ -1,0 +1,2 @@
+const e=document.getElementById("darkModeToggle");"enabled"===localStorage.getItem("darkMode")&&document.body.classList.add("dark-mode"),e.addEventListener("click",()=>{document.body.classList.toggle("dark-mode"),document.body.classList.contains("dark-mode")?localStorage.setItem("darkMode","enabled"):localStorage.setItem("darkMode","disabled")});
+//# sourceMappingURL=Messageboard-G6.12d32aec.js.map

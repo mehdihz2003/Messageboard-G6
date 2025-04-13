@@ -18,6 +18,9 @@ PostIT is a messageboard which uses digital post-its to serve as messages. The p
 - Fireworks when posting messages
 - Emoji panel
 
+## Installation
+Clone the repository and then run `npm i` to download all the necessary dependancies.
+
 ## Contributors
 [Mehdi HZ](https://github.com/mehdihz2003)
 

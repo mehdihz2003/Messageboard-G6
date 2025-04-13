@@ -5,9 +5,15 @@ Post-IT is a messageboard where users can postk messages in the form of post-its
 
 ## Contributors
 [Mehdi HZ](https://github.com/mehdihz2003)
+
 [Leon DE](https://github.com/leondenengelsen) 
+
 [Matti W](https://github.com/mattiwalli) 
+
 [Kimiya MF](https://github.com/Kimiya777)
+
 [Linn AS](https://github.com/munchkin870411)
+
 [Ida L](https://github.com/MetalMuffin)
+
 [Marcel C](https://github.com/Marvelmta)

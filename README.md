@@ -2,7 +2,7 @@
 Versioncontrol final project group 6
 ## Description
 PostIT is a messageboard which uses digital post-its to serve as messages. The project uses Firebase to store messages. The project has the following features:
--Live Updates
+--Live Updates
 Profanity Filter
 Drag and Drop Eraser
 Post-It random rotation
